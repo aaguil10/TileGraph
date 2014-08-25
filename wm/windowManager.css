@@ -1,0 +1,44 @@
+.window{
+   background-color: gray;
+   border:1px solid black;
+	position: absolute;
+}
+
+.handle{
+position: absolute;
+   height:15px;
+   background-color: aliceblue;
+   border:1px solid black;
+}
+
+.resize{
+	border:1px solid blue;
+	position: absolute;
+}
+
+
+.NW{
+	cursor: nw-resize;
+}
+.NE{
+	cursor: ne-resize;
+}
+.SW{
+	cursor: sw-resize;
+}
+.SE{
+	cursor: se-resize;
+}
+
+.N{
+	cursor: n-resize;
+}
+.S{
+	cursor: s-resize;
+}
+.W{
+	cursor: w-resize;
+}
+.E{
+	cursor: e-resize;
+}
