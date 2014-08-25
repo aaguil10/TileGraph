@@ -67,6 +67,10 @@ JSWindow = function (w,h,t,l, content) {
 	var dragE = function (drag, ui) {
 		if(_this.dragging === false){ return; }
 		var n = calculateSize(drag, ui, this, _this, 'e');
+		resizeE(n,_this);
+  };
+
+	function resizeE(n, _this){
 		var s = _this.getSize();
   	_this.setSize(n.absolute.left, s.height, 10, false);
 		var p = _this.getPosition();
@@ -94,10 +98,8 @@ JSWindow = function (w,h,t,l, content) {
 			var other = stack[k];
 			var sz = other.getSize();
   		other.setSize(n.absolute.left, sz.height, 10, false);
-			
 		}
-  };
-
+	}
 
 	function isinArray(array,object){
 		for(var k = 0; k < array.length; k++){
@@ -111,9 +113,36 @@ JSWindow = function (w,h,t,l, content) {
 	var dragW = function (drag, ui) {
 		if(_this.dragging === false){ return; }
 		var n = calculateSize(drag, ui, this, _this, 'w');
-  	_this.setSize(n.relative.left, 0, 10, true);
-		_this.setPosition(-n.relative.left, 0, true);
+  	//_this.setSize(n.relative.left, 0, 10, true);
+		//_this.setPosition(-n.relative.left, 0, true);
+		resizeW(n, _this);
   };
+
+	function resizeW(n, _this){
+	  _this.setSize(n.relative.left, 0, 10, true);
+		_this.setPosition(-n.relative.left, 0, true);	
+
+		var stack = new Array();
+		stack.push(_this);
+
+		var node = t_graph.find(_this);
+		for(var i = 0; i < node.west.length; i++){
+			var east = node.west[i].self;
+			var size = east.getSize();
+			east.setSize(-n.relative.left, 0, 10, true);
+
+			for( j = 0; j < node.west[i].east.length; j++){
+				if( !isinArray(stack, node.west[i].east[j].self) ){
+					stack.push(node.west[i].east[j].self);
+				}
+			}
+		}
+		for(var k = 1; k < stack.length; k++){
+			var other = stack[k];
+	  	other.setSize(n.relative.left, 0, 10, true);
+			other.setPosition(-n.relative.left, 0, true);
+		}
+	}
 
 	var dragNW = function (drag, ui) {
 		if(_this.dragging === false){ return; }
@@ -128,8 +157,9 @@ JSWindow = function (w,h,t,l, content) {
 		var n = calculateSize(drag, ui, this, _this, 'ne');
   	_this.setSize(0, n.relative.top, 10, true);
 		_this.setPosition(0, -n.relative.top, true);
-		var s = _this.getSize();
-  	_this.setSize(n.absolute.left, s.height, 10, false);
+		//var s = _this.getSize();
+  	//_this.setSize(n.absolute.left, s.height, 10, false);
+		resizeE(n, _this);
   };
 	var dragSW = function (drag, ui) {
 		if(_this.dragging === false){ return; }
