@@ -11,13 +11,14 @@ WM.prototype.find = function (window){
 	return null;
 }
 
-JSWindow = function (w,h,t,l, content) {
+JSWindow = function (w,h,t,l, content, title) {
 	var _this = this;
 	this.w = w;
 	this.h = h;
 	this.t = t;
 	this.l = l;
 	this.dragging = true;
+	this.title = title;
 
 	this.window = document.createElement('DIV');
 	$(this.window).addClass('window');
@@ -48,6 +49,12 @@ JSWindow = function (w,h,t,l, content) {
 
 	this.E = this.window.appendChild(document.createElement('DIV'));
 	$(this.E).addClass('resize E');
+
+	$(this.handle).click(function (){
+		console.log('_____________________');
+		t_graph.find(_this).print('links');
+		console.log('_____________________');
+	});
 
 	var dragN = function (drag, ui) {
 		if(_this.dragging === false){ return; }
@@ -99,6 +106,7 @@ JSWindow = function (w,h,t,l, content) {
 			var sz = other.getSize();
   		other.setSize(n.absolute.left, sz.height, 10, false);
 		}
+		t_graph.updateEW(_this, 'e');
 	}
 
 	function isinArray(array,object){
@@ -142,6 +150,7 @@ JSWindow = function (w,h,t,l, content) {
 	  	other.setSize(n.relative.left, 0, 10, true);
 			other.setPosition(-n.relative.left, 0, true);
 		}
+		t_graph.updateEW(_this, 'w');
 	}
 
 	var dragNW = function (drag, ui) {
@@ -270,6 +279,7 @@ JSWindow.prototype.setSize = function (w, h, fixedCorner, relative) {
 
 	this.w = w;
 	this.h = h;
+	t_graph.update_size(this, w, h);
 
 	$(this.window).css({
     width: w + 'px',
@@ -348,6 +358,7 @@ JSWindow.prototype.setPosition = function (l, t, relative) {
 
 	this.l = l;
 	this.t = t;
+	t_graph.update_position(this, l, t);
 
 	$(this.window).css({
 		left: l + 'px',
