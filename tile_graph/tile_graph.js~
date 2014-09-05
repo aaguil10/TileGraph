@@ -795,7 +795,7 @@ node.prototype.returnX = function (direction,boo) {
 };
 
 node.prototype.cut_link = function (opt) {
-	//console.log("Cutting link!");
+	console.log("Cutting link!");
 	if(opt === 'n' || opt === 'all'){
 		for(var i = 0; i < this.north.length; i++){
 			cut_self(this.north[i].south, this);
@@ -837,14 +837,6 @@ function cut_self(array, self){
 
 node.prototype.updateLinks = function (nodes) {
 	this.cut_link('all');
-	var me = this.self;
-	var s = me.getSize();
-	var p = me.getPosition();
-	this.w = s.width;
-	this.h = s.height;
-	this.left = p.left;
-	this.top = p.top;
-	
 	for(var i = 0; i < nodes.length; i++){
 		var tmp = nodes[i];
 		//console.log('tmp:', tmp);
@@ -878,7 +870,7 @@ node.prototype.updateLinks = function (nodes) {
 
 function isNextTo(a, curr, opt){
 	if(opt === 'ew'){
-		if( (a.left) < (curr.left + curr.w) ){
+		if(a.left < (curr.left + curr.w) ){
 			if( (a.left + a.w) > curr.left ){
 				return true;
 			}
@@ -895,9 +887,9 @@ function isNextTo(a, curr, opt){
 }
 
 function above(a, curr){
-	var minH = a.self.minHeight - 1; // /2; //makes function less sensitive
-	if( (a.top + a.h - minH ) <= curr.top){
-		if(curr.top <= (a.top + a.h + minH ) ){
+	//console.log('a:', a);
+	if( (a.top + a.h - 2) <= curr.top){
+		if(curr.top <= (a.top + a.h + 2) ){
 			return true;
 		}
 	} 
@@ -905,10 +897,9 @@ function above(a, curr){
 }
 
 function below(a, curr){
-	var minH = a.self.minHeight - 1;// /2; //makes function less sensitive
 	var c = curr.top + curr.h;
-	if(a.top - minH <= c){
-		if(c <= a.top + minH){
+	if(a.top - 2 <= c){
+		if(c <= a.top + 2){
 			return true;
 		}
 	}
@@ -916,10 +907,9 @@ function below(a, curr){
 }
 
 function onLeft(a, curr){
-	var minW = a.self.minWidth - 1; // /2; //makes function less sensitive
 	var l = a.left + a.w;
-	if( (l - minW ) <= curr.left ){
-		if(curr.left <= (l+minW) ){
+	if( (l - 2) <= curr.left ){
+		if(curr.left <= (l+2) ){
 			return true;
 		}
 	} 
@@ -927,10 +917,9 @@ function onLeft(a, curr){
 }
 
 function onRight(a, curr){
-	var minW = a.self.minWidth - 1;// /2; //makes function less sensitive
 	var c = curr.left + curr.w;
-	if(a.left - minW <= c){
-		if(c <= a.left + minW){
+	if(a.left - 2 <= c){
+		if(c <= a.left + 2){
 			return true;
 		}
 	}
@@ -938,19 +927,6 @@ function onRight(a, curr){
 }
 
 
-function around(num1, num2, size){
-	if(num2 - size <= num1){
-		if(num1 <= num2 + size){
-			return true;
-		}
-	}
-	return false;
-}
 
-function gDebug(node, opt){
-	if(node.self.title === 'Polar Love'){
-		console.log("nextTo:", opt.self.title );
-	}
-	
-}
+
 

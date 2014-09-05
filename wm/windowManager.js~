@@ -19,8 +19,6 @@ JSWindow = function (w,h,t,l, content, title) {
 	this.l = l;
 	this.dragging = true;
 	this.title = title;
-	this.minWidth = 200;
-	this.minHeight = 50;
 
 	this.window = document.createElement('DIV');
 	$(this.window).addClass('window');
@@ -59,133 +57,39 @@ JSWindow = function (w,h,t,l, content, title) {
 	});
 
 	function resizeN(n, _this){
-		_this.setSize(0, n.relative.top, 10, true);
+  	_this.setSize(0, n.relative.top, 10, true);
 		_this.setPosition(0, -n.relative.top, true);
 
 		var stack = new Array();
 		stack.push(_this);
 
 		var node = t_graph.find(_this);
-		
-		for(var i = 0; i < node.north.length; i++){
-			stack.push(node.north[i].self);
-		}
-		var nextStart = stack.length;
-		
 		for(var i = 0; i < node.north.length; i++){
 			var north = node.north[i].self;
-			north.setSize(0, -n.relative.top, 10, true);
-		
-			for(var j = 0; j < node.north[i].south.length; j++){
-				if(	!isinArray(stack, node.north[i].south[j].self) ){
-					stack.push(node.north[i].south[j].self);
-				}
-			}
+			var s = north.getSize();
+  		//north.setSize(s.width, (n.absolute.top + s.height), 10, false);
+  		north.setSize(0, -n.relative.top, 10, true);
+			//north.setPosition(0, -n.relative.top, true);
 		}
-		/*for(var k = 0; k < stack.length; k++){
-			var other = stack[k];
-			//var sz = other.getSize();
-			if(other != _this){
-				other.setSize(0, n.relative.top, 10, true);
-				other.setPosition(0, -(n.relative.top), true);
-			}	
-		}*/
-		resizeLinks('n', reSouth, reNorth, n, stack, nextStart); 
-		t_graph.updateGraphState();
-		
-		function reSouth(other, n, obj){
-			other.setSize(0, n.relative.top, 10, true);
-			other.setPosition(0, -(n.relative.top), true);
-			console.log('reSouth()');
-		}
-		function reNorth(other, n){
-			other.setSize(0, -n.relative.top, 10, true);
-			console.log('reNorth()');
-		}
-	};
-
-	
-	function resizeS(n, _this){
-		var s = _this.getSize();
-	  	_this.setSize(s.width, n.absolute.top, 10, false);
-	  	//var p = _this.getPosition();
-		var p = _this.getPosition();
-		var obj = new Object();
-		obj.s = s;
-		obj.p = p;
-
-	  	
-		var stack = new Array();
-		stack.push(_this);
-
-		var node = t_graph.find(_this);
-		
-		for(var i = 0; i < node.south.length; i++){
-			stack.push(node.south[i].self);
-		}
-		var nextStart = stack.length;
-		
-	  	for(var i = 0; i < node.south.length; i++){
-	  		var south = node.south[i].self;
-	  		var pos = south.getPosition();
-	  		var newSize = p.top + s.height - pos.top;
-	  		south.setSize(0, -newSize, 10, true);	
-			south.setPosition(0, newSize, true);  
-			
-			for(var j = 0; j < node.south[i].north.length; j++){
-				if(!isinArray(stack, node.south[i].north[j].self) ){
-					stack.push(node.south[i].north[j].self);
-				}
-			}
-	  	}
-	  	/*for(var k = 0; k < stack.length; k++){
-	  		var other = stack[k];
-	  		var sz = other.getSize();
-			if(other != _this){
-			  	other.setSize(sz.width, n.absolute.top, 10, false);				
-			}
-	  	}*/
-		resizeLinks('s', reSouth, reNorth, n, stack, nextStart, obj);  	
-		t_graph.updateGraphState();
-		
-		function reSouth(other, n, obj){
-			var pos = other.getPosition();
-	  		var newSize = obj.p.top + obj.s.height - pos.top;
-	  		other.setSize(0, -newSize, 10, true);	
-			other.setPosition(0, newSize, true); 
-			console.log('reSouth()');
-		}
-		function reNorth(other, n){
-			var sz = other.getSize();
-		  	other.setSize(sz.width, n.absolute.top, 10, false);	
-			console.log('reNorth()');
-		}
-		
 	}
+
 
 	function resizeE(n, _this){
 		var s = _this.getSize();
-		_this.setSize(n.absolute.left, s.height, 10, false);
+  	_this.setSize(n.absolute.left, s.height, 10, false);
 		var p = _this.getPosition();
-		var obj = new Object();
-		obj.s = s;
-		obj.p = p;
 
 		var stack = new Array();
 		stack.push(_this);
 
 		var node = t_graph.find(_this);
-		
-		for(var i = 0; i < node.east.length; i++){
-			stack.push(node.east[i].self);
-		}
-		var nextStart = stack.length;
-		
 		for(var i = 0; i < node.east.length; i++){ //resize windows next to "this"
 			var west = node.east[i].self;
+			var size = west.getSize();
 			var pos = west.getPosition();
-			var newSize =  p.left + s.width - pos.left;
-			west.setSize(-newSize , 0, 10, true);	
+			var newSize = n.absolute.left - pos.left;
+			newSize =  p.left + s.width - pos.left;
+  		west.setSize(-newSize , 0, 10, true);	
 			west.setPosition( newSize, 0, true);
 
 			for(var j = 0; j < node.east[i].west.length; j++){
@@ -194,147 +98,42 @@ JSWindow = function (w,h,t,l, content, title) {
 				}
 			}
 		}
-		/*for(var k = 0; k < stack.length; k++){ //resize the other windows that where conected to "this"
+		for(var k = 0; k < stack.length; k++){ //resize the other windows that where conected to "this"
 			var other = stack[k];
 			var sz = other.getSize();
-			other.setSize(n.absolute.left, sz.height, 10, false);
-		}*/
-		resizeLinks('e', reWest, reEast, n, stack, nextStart, obj);
+  		other.setSize(n.absolute.left, sz.height, 10, false);
+		}
+		//t_graph.updateEW(_this, 'e');
 		t_graph.updateGraphState();
-		
-		function reWest(other, n, obj){
-			var pos = other.getPosition();
-			var newSize =  obj.p.left + obj.s.width - pos.left;
-			other.setSize(-newSize , 0, 10, true);	
-			other.setPosition( newSize, 0, true);
-			console.log('reWest()');
-		}
-		function reEast(other, n){
-			var sz = other.getSize();
-			other.setSize(n.absolute.left, sz.height, 10, false);
-			console.log('reEast()');
-		}
-		
 	}
 
 	function resizeW(n, _this){
-		_this.setSize(n.relative.left, 0, 10, true);
+	  _this.setSize(n.relative.left, 0, 10, true);
 		_this.setPosition(-n.relative.left, 0, true);	
 
 		var stack = new Array();
 		stack.push(_this);
-		
+
 		var node = t_graph.find(_this);
-		
-		for(var i = 0; i < node.west.length; i++){
-			stack.push(node.west[i].self);
-		}
-		var nextStart = stack.length;
-		
 		for(var i = 0; i < node.west.length; i++){
 			var east = node.west[i].self;
 			var size = east.getSize();
 			east.setSize(-n.relative.left, 0, 10, true);
-			//stack.push(node.west[i].self);
-			
+
 			for( j = 0; j < node.west[i].east.length; j++){
 				if( !isinArray(stack, node.west[i].east[j].self) ){
 					stack.push(node.west[i].east[j].self);
 				}
 			}
 		}
-		/*for(var k = 1; k < stack.length; k++){
+		for(var k = 1; k < stack.length; k++){
 			var other = stack[k];
-			other.setSize(n.relative.left, 0, 10, true);
+	  	other.setSize(n.relative.left, 0, 10, true);
 			other.setPosition(-n.relative.left, 0, true);
-		}*/
-		console.log('_________________');
-		resizeLinks('w', reWest, reEast, n, stack, nextStart);
+		}
+		//t_graph.updateEW(_this, 'w');
 		t_graph.updateGraphState();
-		
-		function reWest(other, n){
-			other.setSize(n.relative.left, 0, 10, true);
-			other.setPosition(-n.relative.left, 0, true);
-			console.log('reWest()');
-		}
-		function reEast(other, n){
-			var size = other.getSize();
-			other.setSize(-n.relative.left, 0, 10, true);
-			console.log('reEast()');
-		}
-		
 	}
-	
-	function resizeLinks(side, resize1, resize2, n, stack, num, obj){
-		console.log('resizeLinks()');
-		
-		if(side === 'n'){
-			console.log('  Started North!');	
-			var nextStart = stack.length;
-			for(var i = num; i < nextStart; i++){
-				resize1(stack[i], n, obj);
-				var curr = t_graph.find(stack[i]);	
-				for(var k = 0; k < curr.north.length; k++){
-					if(!isinArray(stack, curr.north[k].self)){
-						stack.push(curr.north[k].self);
-					}
-				}
-			}
-			if(num === nextStart){return;}
-			resizeLinks('s', resize1, resize2, n, stack, nextStart, obj);
-		}
-		
-		
-		if(side === 's'){
-			console.log('  Started South!');	
-			var nextStart = stack.length;
-			for(var i = num; i < nextStart; i++){
-				resize2(stack[i], n, obj);
-				var curr = t_graph.find(stack[i]);
-				for(var k = 0; k < curr.south.length; k++){
-					if(!isinArray(stack, curr.south[k].self)){
-						stack.push(curr.south[k].self);
-					}
-				}
-			}
-			if(num === nextStart){return;}
-			resizeLinks('n', resize1, resize2, n, stack, nextStart, obj);
-		}
-		
-		
-		if(side === 'w'){
-			console.log('  Started West!');
-			var nextStart = stack.length;
-			for(var i = num; i < nextStart; i++){
-				resize1(stack[i], n, obj);
-				var curr = t_graph.find(stack[i]);
-				for(var k = 0; k < curr.west.length; k++){
-					if(!isinArray(stack, curr.west[k].self)){
-						stack.push(curr.west[k].self);
-					}
-				}
-			}
-			if(num === nextStart){return;}
-			resizeLinks('e', resize1, resize2, n, stack, nextStart, obj);
-		}
-		if(side === 'e'){
-			console.log('  Started East!');
-			var nextStart = stack.length;
-			for(var i = num; i < nextStart; i++){
-				resize2(stack[i], n, obj);
-				var curr = t_graph.find(stack[i]);
-				for(var k = 0; k < curr.east.length; k++){
-					if(!isinArray(stack, curr.east[k].self) ){
-						stack.push(curr.east[k].self);
-					}
-				}
-			}
-			if(num === nextStart){return;}
-			resizeLinks('w', resize1, resize2, n, stack, nextStart, obj);
-		}
-		
-	}
-	
 
 	var dragN = function (drag, ui) {
 		if(_this.dragging === false){ return; }
@@ -344,7 +143,8 @@ JSWindow = function (w,h,t,l, content, title) {
 	var dragS = function (drag, ui) {
 		if(_this.dragging === false){ return; }
 		var n = calculateSize(drag, ui, this, _this, 's');
-		resizeS(n, _this);
+		var s = _this.getSize();
+  	_this.setSize(s.width, n.absolute.top, 10, false);
   };
 
 
